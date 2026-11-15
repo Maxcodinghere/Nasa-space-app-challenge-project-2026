@@ -33,6 +33,7 @@ st.title("Forecast predictions for the next weeks")
 st.caption("NASA SMAP L4 (9 km) · same weekday & 3-hour slot every week · XGBoost, 1–26 weeks ahead (you choose)")
 
 with st.sidebar:
+    st.title("Inputs")
     st.header("Location & history")
     lat = st.number_input("Latitude", -90.0, 90.0, 48.4187, step=0.1, format="%.4f")
     lon = st.number_input("Longitude", -180.0, 180.0, -104.4876, step=0.1, format="%.4f")
@@ -131,7 +132,7 @@ def show_table(df, decimals=4):
     st.html('<div style="overflow-x:auto;max-height:420px;overflow-y:auto">'
             + out.to_html(index=False, na_rep="-", float_format=lambda v: f"{v:.{decimals}f}",
                           border=0, classes="smaptable") + "</div>"
-            '<style>.smaptable{border-collapse:collapse;font-size:0.9rem}'
+            "<style>.smaptable{border-collapse:collapse;font-size:0.9rem;font-family:'Roboto',sans-serif}"
             '.smaptable th,.smaptable td{padding:4px 12px;text-align:right;'
             'border-bottom:1px solid #8884}</style>')
 
@@ -177,7 +178,9 @@ def make_chart(hist, fc, col, title, unit="m³/m³", bounds=(None, None), window
                        alt.Tooltip("hi:Q", title="High (+ error)", format=fmt)])
     band = alt.Chart(alt.Data(values=_records(link))).mark_area(opacity=0.2, color="#d62728").encode(
         x, alt.Y("lo:Q"), alt.Y2("hi:Q"))
-    return (band + obs + pred).properties(title=title, height=300).interactive()
+    chart = (band + obs + pred).properties(title=title, height=300).interactive()
+    # Roboto for everything inside the chart (axes, labels, tooltips), Inter for its title, like the page headings
+    return chart.configure(font="Roboto").configure_title(font="Inter", fontWeight=600, anchor="start")
 
 
 SOIL_NAMES = {"sm_surface": "Surface soil moisture (m³/m³)", "sm_rootzone": "Root-zone soil moisture (m³/m³)"}
@@ -211,7 +214,7 @@ if run:
         with st.status(f"{step}/{n_steps}  Fetching SMAP data (cached weeks are reused) ...", expanded=True) as s1:
             log1 = LiveLog(st.empty())
             hist = fetch(lat, lon, int(n_weeks), end_date, slot, workers, user, pwd, log1)
-            s1.update(label=f"{step}/{n_steps}  Data ready: {hist['sm_surface'].notna().sum()} of {len(hist)} weeks have values",
+            s1.update(label=f"{step}/{n_steps}  Data: {hist['sm_surface'].notna().sum()} of {len(hist)} weeks have values",
                       state="complete", expanded=False)
         features = None
         if weather_sel:
@@ -221,7 +224,7 @@ if run:
                 with contextlib.redirect_stdout(logw):
                     hist = wf.add_weather(hist, lat, lon)
                 full = int(hist[weather_sel].notna().all(axis=1).sum())
-                sw.update(label=f"{step}/{n_steps}  Weather ready: {full} of {len(hist)} weeks complete",
+                sw.update(label=f"{step}/{n_steps}  Weather_data: {full} of {len(hist)} weeks complete",
                           state="complete", expanded=False)
             features = list(xm.TARGETS) + list(weather_sel)
         input_cols = list(xm.TARGETS) + list(weather_sel)
@@ -322,8 +325,6 @@ else:
                    "like MAE but big misses count more; it is the ± shown in the forecast. **Correlation**: 1 means the "
                    "predictions rise and fall exactly with the real values, 0 means no relationship. "
                    "**Test weeks used**: how many unseen weeks were scored.")
-    with st.expander("Most important features"):
-        show_table(res["importance"].reset_index(names="feature"), 3)
     with st.expander("Weekly data used (the table behind the model)"):
         show_table(hist)
         st.download_button("Download data CSV", hist.to_csv(index=False), "weekly_data.csv", "text/csv")

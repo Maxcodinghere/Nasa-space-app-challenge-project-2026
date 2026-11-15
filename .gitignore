@@ -1,0 +1,21 @@
+# virtual environment and Python caches (code/xgboost_model.pyc is NOT ignored: it is the only copy of the model)
+.venv/
+__pycache__/
+.pytest_cache/
+
+# temporary / lock files written while downloading and caching
+*.tmp
+*.part
+*.lock
+
+# machine-specific (paths to your local login files)
+.dodsrc
+
+# raw downloads that scripts/hackathon_weekly.py re-creates on demand (about 9 MB)
+data/hackathon_cache/
+
+# credentials: never commit these
+.env
+.cdsapirc
+.netrc
+_netrc

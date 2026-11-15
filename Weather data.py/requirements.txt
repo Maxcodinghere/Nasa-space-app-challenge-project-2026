@@ -1,0 +1,15 @@
+streamlit
+requests
+pandas
+xarray
+openpyxl
+zarr 
+dask 
+fsspec 
+cdsapi>=0.7.7
+netCDF4
+numpy
+httpio
+
+
+python -m pip install streamlit requests pandas openpyxl zarr dask fsspec netCDF4 numpy httpio cdsapi>=0.7.7 xarray

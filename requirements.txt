@@ -1,0 +1,14 @@
+streamlit~=1.67
+altair~=6.3
+pandas~=3.1
+numpy~=2.5
+h5py~=3.16
+requests~=2.34
+harmony-py~=1.8
+xgboost~=3.4
+scikit-learn~=1.9
+
+# optional
+earthaccess~=0.19
+matplotlib~=3.11
+pytest~=9.2
